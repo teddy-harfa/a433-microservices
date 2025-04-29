@@ -1,1 +1,1 @@
-https://hub.docker.com/r/tmasbro99/item-app/tags
+https://github.com/users/teddy-harfa/packages/container/package/item-app

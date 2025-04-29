@@ -1,15 +1,6 @@
 version: "3.7" #menggunakan docker compose versi 2 atau lebih
 
 services:
-  #service untuk aplikasi
-  item-app:
-    image: tmasbro99/item-app:v1 #menggunakan image dari hasil build dan push
-    container_name: item-app #memberi nama container item-app
-    ports:
-      - 80:8080 #mengarahkan port 80 pada host ke port 8080 pada container
-    depends_on:
-      - item-db #item-app hanya dijalankan setelah item-db berjalan
-    restart: always #lakukan restart setiap kali container berhenti
   #service untuk database aplikasi
   item-db:
     image: mongo:3 #menggunakan image mongodb versi 3 dari Dockerhub
@@ -17,6 +8,15 @@ services:
     volumes:
       - app-db:/data/db #menyimpan data mongodb ke volume app-db
     restart: always #lakukan restart setiap kali container terhenti
+  #service untuk aplikasi
+  item-app:
+    image: ghcr.io/teddy-harfa/item-app:v1 #menggunakan image dari hasil build dan push
+    container_name: item-app #memberi nama container item-app
+    ports:
+      - 80:8080 #mengarahkan port 80 pada host ke port 8080 pada container
+    depends_on:
+      - item-db #item-app hanya dijalankan setelah item-db berjalan
+    restart: always #lakukan restart setiap kali container berhenti
 
 volumes:
   app-db: #membuat volume untuk digunakan oleh item-db
