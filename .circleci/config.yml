@@ -10,11 +10,12 @@ jobs:
           name: Install hadolint
           command: |
             apk add --no-cache curl bash
-            curl -L -o /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
-            chmod +x /usr/local/bin/hadolint
+            mkdir -p $HOME/bin
+            curl -L -o $HOME/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+            chmod +x $HOME/bin/hadolint
       - run:
           name: Lint Dockerfile
-          command: hadolint Dockerfile
+          command: $HOME/bin/hadolint Dockerfile
 
   test-app:
     docker:
