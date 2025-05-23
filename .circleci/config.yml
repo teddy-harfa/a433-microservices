@@ -1,0 +1,57 @@
+version: 2.1
+
+jobs:
+  lint-dockerfile:
+    docker:
+      - image: alpine:latest
+    steps:
+      - checkout
+      - run:
+          name: Install hadolint
+          command: |
+            apk add --no-cache curl bash
+            curl -L -o /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+            chmod +x /usr/local/bin/hadolint
+      - run:
+          name: Run hadolint
+          command: hadolint Dockerfile
+
+  test-app:
+    docker:
+      - image: cimg/go:1.15
+    steps:
+      - checkout
+      - run:
+          name: Run Unit Tests
+          command: go test -v -short --count=1 $(go list ./...)
+
+  build-app-karsajobs:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and Push Docker Image
+          command: |
+            echo "Build image...."
+            docker build -t ghcr.io/teddy-harfa/karsajobs:latest .
+
+            echo "Daftar Image karsajobs di lokal:"
+            docker images | grep 'karsajobs'
+
+            echo "Login ke GitHub Container Registry..."
+            echo $CR_PAT | docker login ghcr.io -u teddy-harfa --password-stdin
+
+            echo "Push image ke GitHub Package Registry..."
+            docker push ghcr.io/teddy-harfa/karsajobs:latest
+
+workflows:
+  lint-test-and-build-karsajobs:
+    jobs:
+      - lint-dockerfile
+      - test-app
+      - build-app-karsajobs:
+          requires:
+            - lint-dockerfile
+            - test-app
